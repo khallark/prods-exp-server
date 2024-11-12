@@ -1,22 +1,22 @@
-import mysql from "mysql2"
-import dotenv from "dotenv"
-dotenv.config()
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const pool = mysql.createPool({
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-}).promise()
-
-
+// PostgreSQL connection pool setup
+const pool = new Pool({
+    host: process.env.PG_HOST,
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    database: process.env.PG_DATABASE,
+    port: process.env.PG_PORT || 5432,
+});
 
 export async function addProduct(category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date) {
     try {
         await pool.query(`
             INSERT INTO products (category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty === null ? 0 : qty, price === null ? 0 : price, manufacturer_name === null ? 'NULL' : manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date]);
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty === null ? 0 : qty, price === null ? 0 : price, manufacturer_name === null ? null : manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date]);
     } catch (error) {
         console.error("Database error adding product:", error);
         throw new Error("Failed to add product to the database");
@@ -24,88 +24,87 @@ export async function addProduct(category, product_name, batch_number, qty, pric
 }
 
 export async function all_prods() {
-    const [result] = await pool.query(
+    const result = await pool.query(
         `SELECT *
         FROM products
         ORDER BY expiry_date ASC;`
-    )
-    return result;
+    );
+    return result.rows;
 }
 
 export async function six_month_exp_prods() {
-    const [result] = await pool.query(
+    const result = await pool.query(
         `SELECT *
         FROM products
-        WHERE expiry_date > CURDATE() AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 6 MONTH)
+        WHERE expiry_date > CURRENT_DATE AND expiry_date <= CURRENT_DATE + INTERVAL '6 months'
         ORDER BY expiry_date ASC;`
-    )
-    return result;
+    );
+    return result.rows;
 }
 
 export async function expd_prods() {
-    const [result] = await pool.query(
+    const result = await pool.query(
         `SELECT *
         FROM products
-        WHERE expiry_date <= CURDATE()
+        WHERE expiry_date <= CURRENT_DATE
         ORDER BY expiry_date ASC;`
-    )
-    return result;
+    );
+    return result.rows;
 }
 
 export async function delete_prod(values) {
     await pool.query(
         `DELETE
         FROM products
-        WHERE category = ? AND product_name = ? AND batch_number = ? AND qty = ? AND price = ? AND manufacturer_name = ? AND bill_number = ? AND expiry_date = ?`,
+        WHERE category = $1 AND product_name = $2 AND batch_number = $3 AND qty = $4 AND price = $5 AND manufacturer_name = $6 AND bill_number = $7 AND expiry_date = $8`,
         values
-    )
+    );
 }
-
 
 function isValidDateFormat(dateString) {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     return regex.test(dateString);
 }
+
 export async function search_string_pref(string) {
-    if(isValidDateFormat(string)) {
-        const [result] = await pool.query(
+    if (isValidDateFormat(string)) {
+        const result = await pool.query(
             `SELECT *
             FROM products
-            WHERE expiry_date = ?`,
+            WHERE expiry_date = $1`,
             [string]
-        )
-        console.log(result)
-        return result;
+        );
+        return result.rows;
     }
     string = string.toLowerCase() + '%';
-    const [result] = await pool.query(
+    const result = await pool.query(
         `SELECT *
         FROM products
-        WHERE LOWER(product_name) LIKE ? OR
-        LOWER(batch_number) LIKE ? OR
-        LOWER(manufacturer_name) LIKE ? OR
-        LOWER(bill_number) LIKE ?`,
+        WHERE LOWER(product_name) LIKE $1 OR
+        LOWER(batch_number) LIKE $2 OR
+        LOWER(manufacturer_name) LIKE $3 OR
+        LOWER(bill_number) LIKE $4`,
         [string, string, string, string]
-    )
-    // console.log(result)
-    return result;
+    );
+    return result.rows;
 }
+
 export async function search_string_hard(string) {
-    if(isValidDateFormat(string)) {
-        const [result] = await pool.query(
+    if (isValidDateFormat(string)) {
+        const result = await pool.query(
             `SELECT *
             FROM products
-            WHERE expiry_date = ?`,
+            WHERE expiry_date = $1`,
             [string]
-        )
-        return result;
+        );
+        return result.rows;
     }
     string = string.toLowerCase().replace(/\s+/g, ' ').trim();
-    const [result] = await pool.query(
+    const result = await pool.query(
         `SELECT *
         FROM products
-        WHERE LOWER(product_name) = ?`,
+        WHERE LOWER(product_name) = $1`,
         [string]
-    )
-    return result;
+    );
+    return result.rows;
 }
