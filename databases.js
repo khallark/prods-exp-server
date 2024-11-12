@@ -18,7 +18,7 @@ export async function addProduct(category, product_name, batch_number, qty, pric
         await pool.query(`
             INSERT INTO products (category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty === null ? null : qty, price === null ? 0 : price, manufacturer_name === null ? null : manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date]);
+        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty, price, manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date]);
     } catch (error) {
         console.error("Database error adding product:", error);
         throw new Error("Failed to add product to the database");
