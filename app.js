@@ -7,7 +7,7 @@ import { addProduct, all_prods, six_month_exp_prods, expd_prods, delete_prod, se
 const app = express()
 app.use(cors());
 app.use(express.json())
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 5432
 
 app.get("/", async (req, res) => {
     res.send("Hello world!")
