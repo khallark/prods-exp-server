@@ -15,21 +15,21 @@ app.get("/", async (req, res) => {
 
 app.get("/allProds", async (req, res) => {
     const product = await all_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date"];
+    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
     const twoDArray = product.map(product => header.map(key => product[key]));
     res.send(twoDArray)
 })
 
 app.get("/expiring", async (req, res) => {
     const product = await six_month_exp_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date"];
+    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
     const twoDArray = product.map(product => header.map(key => product[key]));
     res.send(twoDArray)
 })
 
 app.get("/expired", async (req, res) => {
     const product = await expd_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date"];
+    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
     const twoDArray = product.map(product => header.map(key => product[key]));
     res.send(twoDArray)
 })
@@ -57,8 +57,8 @@ app.delete('/delete', async (req, res) => {
 
 app.post("/addproduct", async (req, res) => {
     try {
-        const { category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date } = req.body;
-        await addProduct(category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date);
+        const { category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date, is_sold } = req.body;
+        await addProduct(category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date, is_sold);
         res.status(201).send("Row added successfully");
     } catch (error) {
         console.error("Error adding product:", error);

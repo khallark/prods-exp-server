@@ -13,12 +13,12 @@ const pool = new Pool({
     port: process.env.PG_PORT || 5432,
 });
 
-export async function addProduct(category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date) {
+export async function addProduct(category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date, is_sold) {
     try {
         await pool.query(`
             INSERT INTO products (category, product_name, batch_number, qty, price, manufacturer_name, bill_number, expiry_date)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
-        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty, price, manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date]);
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+        `, [category, product_name.replace(/\s+/g, ' ').trim(), batch_number, qty, price, manufacturer_name.replace(/\s+/g, ' ').trim(), bill_number, expiry_date, is_sold]);
     } catch (error) {
         console.error("Database error adding product:", error);
         throw new Error("Failed to add product to the database");
