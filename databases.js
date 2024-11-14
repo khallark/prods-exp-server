@@ -78,7 +78,7 @@ export async function search_string_pref(string) {
         );
         return result.rows;
     }
-    string = string.toLowerCase() + '%';
+    string = '%' + string.toLowerCase() + '%';
     const result = await pool.query(
         `SELECT *
         FROM products
