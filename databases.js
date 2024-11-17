@@ -82,11 +82,12 @@ export async function search_string_pref(string) {
     const result = await pool.query(
         `SELECT *
         FROM products
-        WHERE LOWER(product_name) LIKE $1 OR
-        LOWER(batch_number) LIKE $2 OR
-        LOWER(manufacturer_name) LIKE $3 OR
-        LOWER(bill_number) LIKE $4`,
-        [string, string, string, string]
+        WHERE LOWER(category) LIKE $1 OR
+        LOWER(product_name) LIKE $2 OR
+        LOWER(batch_number) LIKE $3 OR
+        LOWER(manufacturer_name) LIKE $5 OR
+        LOWER(bill_number) LIKE $5`,
+        [string, string, string, string, string]
     );
     return result.rows;
 }
