@@ -44,6 +44,16 @@ export async function six_month_exp_prods() {
     return result.rows;
 }
 
+export async function three_month_exp_prods() {
+    const result = await pool.query(
+        `SELECT *
+        FROM products
+        WHERE expiry_date > CURRENT_DATE AND expiry_date <= CURRENT_DATE + INTERVAL '3 months'
+        ORDER BY expiry_date ASC;`
+    );
+    return result.rows;
+}
+
 export async function expd_prods() {
     const result = await pool.query(
         `SELECT *

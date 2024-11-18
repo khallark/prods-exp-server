@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from "dotenv"
 import cors from 'cors'
 dotenv.config()
-import { addProduct, all_prods, six_month_exp_prods, expd_prods, delete_prod, search_string_pref, search_string_hard } from "./databases.js"
+import { addProduct, all_prods, six_month_exp_prods, three_month_exp_prods, expd_prods, delete_prod, search_string_pref, search_string_hard } from "./databases.js"
 
 const app = express()
 app.use(cors());
@@ -22,6 +22,13 @@ app.get("/allProds", async (req, res) => {
 
 app.get("/expiring", async (req, res) => {
     const product = await six_month_exp_prods()
+    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
+    const twoDArray = product.map(product => header.map(key => product[key]));
+    res.send(twoDArray)
+})
+
+app.get("/expiring3", async (req, res) => {
+    const product = await three_month_exp_prods()
     const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
     const twoDArray = product.map(product => header.map(key => product[key]));
     res.send(twoDArray)
