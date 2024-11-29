@@ -13,33 +13,13 @@ app.get("/", async (req, res) => {
     res.send("Hello world!")
 })
 
-app.get("/allProds", async (req, res) => {
-    const product = await all_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
-    const twoDArray = product.map(product => header.map(key => product[key]));
-    res.send(twoDArray)
-})
+const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
+function map(product) {return product.map(product => header.map(key => product[key]));}
 
-app.get("/expiring", async (req, res) => {
-    const product = await six_month_exp_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
-    const twoDArray = product.map(product => header.map(key => product[key]));
-    res.send(twoDArray)
-})
-
-app.get("/expiring3", async (req, res) => {
-    const product = await three_month_exp_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
-    const twoDArray = product.map(product => header.map(key => product[key]));
-    res.send(twoDArray)
-})
-
-app.get("/expired", async (req, res) => {
-    const product = await expd_prods()
-    const header = ["category", "product_name", "batch_number", "qty", "price", "manufacturer_name", "bill_number", "expiry_date", "is_sold"];
-    const twoDArray = product.map(product => header.map(key => product[key]));
-    res.send(twoDArray)
-})
+app.get("/allProds", async (req, res) => {res.send(map(await all_prods()));})
+app.get("/expiring", async (req, res) => {res.send(map(await six_month_exp_prods()));})
+app.get("/expiring3", async (req, res) => {res.send(map(await three_month_exp_prods()));})
+app.get("/expired", async (req, res) => {res.send(map(await expd_prods()));})
 
 app.get("/searchStringPref/:str", async (req, res) => {
     const { str } = req.params;
