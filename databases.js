@@ -96,7 +96,8 @@ export async function search_string_pref(string) {
         LOWER(product_name) LIKE $2 OR
         LOWER(batch_number) LIKE $3 OR
         LOWER(manufacturer_name) LIKE $4 OR
-        LOWER(bill_number) LIKE $5`,
+        LOWER(bill_number) LIKE $5
+        ORDER BY expiry_date ASC;`,
         [string, string, string, string, string]
     );
     return result.rows;
